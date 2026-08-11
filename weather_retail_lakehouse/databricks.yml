@@ -1,16 +1,12 @@
-# This is a Databricks asset bundle definition for weather_retail_lakehouse_databricks.
+# This is a Databricks asset bundle definition for weather_retail_lakehouse.
 # See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
 bundle:
-  name: weather_retail_lakehouse_databricks
-  uuid: 3bbabc46-8a47-4659-9b39-d01e4e74ebd4
+  name: weather_retail_lakehouse
+  uuid: 12da2789-30d9-42ab-b292-f677c531ffae
 
 include:
   - resources/*.yml
-
-artifacts:
-  python_artifact:
-    type: whl
-    build: uv build --wheel
+  - ./weather_retail_lakehouse_databricks/resources/wf_bronze_landing_walmart_csv.yml
 
 # Variable declarations. These variables are assigned in the dev/prod targets below.
 variables:
