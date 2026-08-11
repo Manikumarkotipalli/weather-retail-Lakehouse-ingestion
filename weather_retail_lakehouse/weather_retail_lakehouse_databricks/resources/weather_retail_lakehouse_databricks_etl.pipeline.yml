@@ -1,0 +1,20 @@
+# The main pipeline for weather_retail_lakehouse_databricks
+
+resources:
+  pipelines:
+    weather_retail_lakehouse_databricks_etl:
+      name: weather_retail_lakehouse_databricks_etl
+      catalog: ${var.catalog}
+      schema: ${var.schema}
+      serverless: true
+      root_path: "../src/weather_retail_lakehouse_databricks_etl"
+
+      libraries:
+        - glob:
+            include: ../src/weather_retail_lakehouse_databricks_etl/transformations/**
+
+      environment:
+        dependencies:
+          # We include every dependency defined by pyproject.toml by defining an editable environment
+          # that points to the folder where pyproject.toml is deployed.
+          - --editable ${workspace.file_path}

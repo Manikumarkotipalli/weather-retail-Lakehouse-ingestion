@@ -1,0 +1,18 @@
+resources:
+  jobs:
+    wf_bronze_landing_walmart_csv:
+      name: wf_bronze_landing_walmart_csv
+
+      tasks:
+        - task_key: bronze_landing_walmart_csv
+
+          spark_python_task:
+            python_file: ../src/notebooks/bronze_landing_walmart_csv.py
+
+          environment_key: default
+
+      environments:
+        - environment_key: default
+          spec:
+            client: "2"
+            dependencies: []
