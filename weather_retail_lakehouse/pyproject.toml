@@ -32,3 +32,11 @@ packages = ["src"]
 
 [tool.ruff]
 line-length = 120
+
+[tool.ruff.lint.per-file-ignores]
+"weather_retail_lakehouse_databricks/src/notebooks/**/*.py" = [
+    "BLE001", # Databricks ingestion notebooks often log row-level failures and continue.
+    "F401",   # Notebook-style files can keep imports for interactive development.
+    "F821",   # Databricks injects spark/dbutils globals at runtime.
+    "I001",   # Preserve notebook cell/import ordering.
+]

@@ -8,6 +8,7 @@ include:
   - resources/*.yml
   - ./weather_retail_lakehouse_databricks/resources/wf_bronze_landing_walmart_csv.yml
   - ./weather_retail_lakehouse_databricks/resources/wf_bronze_landing_open_meteo_api.yml
+  - ./weather_retail_lakehouse_databricks/resources/wf_weather_sdp.yml
 
 # Variable declarations. These variables are assigned in the dev/prod targets below.
 variables:
