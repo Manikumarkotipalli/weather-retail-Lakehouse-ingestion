@@ -1,0 +1,63 @@
+name: Deploy Databricks Bundle
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Databricks bundle target to deploy
+        required: true
+        default: dev
+        type: choice
+        options:
+          - dev
+          - prod
+      run_after_deploy:
+        description: Run a bundle job or pipeline after deployment
+        required: true
+        default: false
+        type: boolean
+      resource_to_run:
+        description: Optional bundle resource key, for example wf_bronze_landing_weather_api
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: deploy-${{ github.event_name == 'workflow_dispatch' && inputs.target || 'dev' }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy ${{ github.event_name == 'workflow_dispatch' && inputs.target || 'dev' }}
+    runs-on: ubuntu-latest
+    environment: ${{ github.event_name == 'workflow_dispatch' && inputs.target || 'dev' }}
+    defaults:
+      run:
+        working-directory: weather_retail_lakehouse
+    env:
+      BUNDLE_TARGET: ${{ github.event_name == 'workflow_dispatch' && inputs.target || 'dev' }}
+      DATABRICKS_AUTH_TYPE: github-oidc
+      DATABRICKS_CLIENT_ID: ${{ vars.DATABRICKS_CLIENT_ID }}
+      DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: Validate bundle
+        run: databricks bundle validate --target "$BUNDLE_TARGET"
+
+      - name: Deploy bundle
+        run: databricks bundle deploy --target "$BUNDLE_TARGET"
+
+      - name: Run deployed resource
+        if: github.event_name == 'workflow_dispatch' && inputs.run_after_deploy && inputs.resource_to_run != ''
+        run: databricks bundle run "${{ inputs.resource_to_run }}" --target "$BUNDLE_TARGET"

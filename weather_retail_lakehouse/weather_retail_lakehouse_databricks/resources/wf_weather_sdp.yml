@@ -1,0 +1,10 @@
+resources:
+  pipelines:
+    weather_forecast_pipeline:
+      name: weather_forecast_pipeline
+      serverless: true
+      catalog: workspace
+      target: silver
+      libraries:
+        - file:
+            path: ../src/notebooks/bronze_landing_sdp.py
