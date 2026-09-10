@@ -26,38 +26,21 @@ on:
 
 permissions:
   contents: read
-  id-token: write
 
 concurrency:
   group: deploy-${{ github.event_name == 'workflow_dispatch' && inputs.target || 'dev' }}
   cancel-in-progress: false
 
 jobs:
-  deploy:
-    name: Deploy ${{ github.event_name == 'workflow_dispatch' && inputs.target || 'dev' }}
+  # The Databricks deployment commands are intentionally disabled while this
+  # project uses Databricks Free Edition. Free Edition does not provide the
+  # account-level federation policy required by GitHub OIDC.
+  deployment-disabled:
+    name: Databricks deployment disabled for Free Edition
     runs-on: ubuntu-latest
-    environment: ${{ github.event_name == 'workflow_dispatch' && inputs.target || 'dev' }}
-    defaults:
-      run:
-        working-directory: weather_retail_lakehouse
-    env:
-      BUNDLE_TARGET: ${{ github.event_name == 'workflow_dispatch' && inputs.target || 'dev' }}
-      DATABRICKS_AUTH_TYPE: github-oidc
-      DATABRICKS_CLIENT_ID: ${{ vars.DATABRICKS_CLIENT_ID }}
-      DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Databricks CLI
-        uses: databricks/setup-cli@main
-
-      - name: Validate bundle
-        run: databricks bundle validate --target "$BUNDLE_TARGET"
-
-      - name: Deploy bundle
-        run: databricks bundle deploy --target "$BUNDLE_TARGET"
-
-      - name: Run deployed resource
-        if: github.event_name == 'workflow_dispatch' && inputs.run_after_deploy && inputs.resource_to_run != ''
-        run: databricks bundle run "${{ inputs.resource_to_run }}" --target "$BUNDLE_TARGET"
+      - name: Explain why deployment is disabled
+        run: |
+          echo "Databricks bundle deployment is disabled for Databricks Free Edition."
+          echo "Deploy manually from the Databricks workspace."
+          echo "Restore the GitHub OIDC commands after moving to a trial or paid account."
