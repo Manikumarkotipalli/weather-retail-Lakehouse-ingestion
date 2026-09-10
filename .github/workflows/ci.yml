@@ -11,34 +11,16 @@ on:
 
 permissions:
   contents: read
-  id-token: write
 
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  bundle-validate:
-    name: Validate Databricks bundle
-    runs-on: ubuntu-latest
-    environment: dev
-    defaults:
-      run:
-        working-directory: weather_retail_lakehouse
-    env:
-      DATABRICKS_AUTH_TYPE: github-oidc
-      DATABRICKS_CLIENT_ID: ${{ vars.DATABRICKS_CLIENT_ID }}
-      DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Databricks CLI
-        uses: databricks/setup-cli@main
-
-      - name: Validate dev bundle
-        run: databricks bundle validate --target dev
-
+  # Databricks bundle validation is disabled while this project uses Databricks
+  # Free Edition. Free Edition cannot configure the account-level service
+  # principal federation policy required by GitHub OIDC. Restore this job when
+  # moving to a Databricks trial or paid account.
   python-checks:
     name: Python checks
     runs-on: ubuntu-latest
@@ -63,10 +45,5 @@ jobs:
       - name: Ruff lint
         run: uv run --no-sync ruff check .
 
-      - name: Run Databricks Connect tests
-        if: vars.RUN_DATABRICKS_TESTS == 'true'
-        env:
-          DATABRICKS_AUTH_TYPE: github-oidc
-          DATABRICKS_CLIENT_ID: ${{ vars.DATABRICKS_CLIENT_ID }}
-          DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST }}
-        run: uv run --no-sync pytest
+      # Databricks Connect tests are disabled for the same reason as bundle
+      # validation above: they require GitHub OIDC authentication.
